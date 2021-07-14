@@ -1,5 +1,6 @@
 const inquirer = require("inquirer");
 
+
 homeChoice = () => {
   inquirer
     .prompt([
@@ -15,39 +16,46 @@ homeChoice = () => {
           "add a role",
           "add an employee",
           "update an employee role",
+          "Exit Employee Tracker",
         ],
       },
     ])
     .then((data) => {
       console.log(data);
 
-if (data.globalChoice === 'view all departments'){
-    viewDepartments()
-}
+      if (data.globalChoice === "view all departments") {
+        viewDepartments();
+      }
 
-if (data.globalChoice === 'view all roles') {
-    viewRoles()
-}
-if (data.globalChoice === 'view all employees') {
-    viewEmployees()
-}
-if (data.globalChoice === 'add a department') {
-    addDepartment()
-}
-if (data.globalChoice === 'add a role') {
-    addRole()
-}
-if (data.globalChoice === 'add an employee') {
-    addEmployee()
-}
-if (data.globalChoice === 'update an employee role') {
-    updateEmployee()
-}
-
-
+      if (data.globalChoice === "view all roles") {
+        viewRoles();
+      }
+      if (data.globalChoice === "view all employees") {
+        viewEmployees();
+      }
+      if (data.globalChoice === "add a department") {
+        addDepartment();
+      }
+      if (data.globalChoice === "add a role") {
+        addRole();
+      }
+      if (data.globalChoice === "add an employee") {
+        addEmployee();
+      }
+      if (data.globalChoice === "update an employee role") {
+        updateEmployee();
+      }
+      if (data.globalChoice === "Exit Employee Tracker") {
+        console.log("Exited Employee Tracker");
+      }
     });
 };
-homeChoice();
+
+welcome = () => {
+  console.log("Welcome to the Employee Tracker")
+  homeChoice()
+}
+welcome()
 
 viewDepartments = () => {
     //READ db departments table
@@ -133,13 +141,28 @@ inquirer
 ])
 .then((data) => {
     //CREATE new employee inside employee table
+    homeChoice()
 })
 }
 
 updateEmployee = () => {
-//
+inquirer
+.prompt([
+
+  // somehow the choices in inquirer have to pull from the table of employees
+  // then we have to take the ID that is chosen and give the user the option of UPDATING the role
+  {
+    message: 'What employee would you like to update?',
+    type: 'list',
+    name: 'employeeNames',
+    choices: [
+      'all the choices',
+      'more choices']
+  }
+])
+.then((data) => {
+  homeChoice()
+})
+
 }
 
-// THEN I am prompted to select an employee to update 
-// and 
-// their new role and this information is updated in the database
