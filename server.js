@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 
 
+
 homeChoice = () => {
   inquirer
     .prompt([
@@ -17,12 +18,12 @@ homeChoice = () => {
           "add an employee",
           "update an employee role",
           "Exit Employee Tracker",
-        ],
+        ]
       },
     ])
     .then((data) => {
-      console.log(data);
 
+// data.globalChoice = ""
       if (data.globalChoice === "view all departments") {
         viewDepartments();
       }
@@ -163,6 +164,4 @@ inquirer
 .then((data) => {
   homeChoice()
 })
-
 }
-
