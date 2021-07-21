@@ -81,11 +81,6 @@ viewRoles = () => {
     }) 
 }
 
-// WHEN I choose to view all roles
-// THEN I am presented with the job title, role id, the department
-//  that role belongs to, and the salary for that role
-
-
 
 viewEmployees = () => {
     //READ db employees table
@@ -99,12 +94,6 @@ viewEmployees = () => {
      console.table(results);
      homeChoice() 
    })
-
-// WHEN I choose to view all employees
-// THEN I am presented with a formatted table showing employee data, including employee ids,
-// first names, last names, job titles, departments, salaries, and managers that the employees report to
-// WHEN I choose to add a department
-
 }
 
 addDepartment = () => {
@@ -118,8 +107,11 @@ addDepartment = () => {
     ])
     .then((data) => {
       //CREATE new department in the department table
-
-      homeChoice();
+      const  sql = `INSERT INTO departments (name) VALUES (?);`;
+      const params = data.addedDepartment
+      db.query(sql, params, (err, results) => {
+        homeChoice();
+      }) 
     });
 };
 
