@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
-
-
+const db = require('./db/connection.js');
+const table = require('console.table')
 
 homeChoice = () => {
   inquirer
@@ -60,7 +60,19 @@ welcome()
 
 viewDepartments = () => {
     //READ db departments table
-    homeChoice() 
+    // db.query('SELECT * FROM `departments`', (data) => {
+    //   console.table(data);
+    // })
+    db.query(
+      'SELECT * FROM `departments`',
+      function(err, results) {
+        console.table(results); // results contains rows returned by server
+        // console.log(fields); // fields contains extra meta data about results, if available
+        homeChoice() 
+      }
+      );
+      
+
 }
 
 viewRoles = () => {
@@ -71,6 +83,7 @@ viewRoles = () => {
 
 viewEmployees = () => {
     //READ db employees table
+   
     homeChoice() 
 }
 
@@ -95,7 +108,7 @@ addRole = () => {
     .prompt([
       {
         type: "input",
-        message: "What is the name of the role you would like to add?",
+        message: "What is the title of the role you would like to add?",
         name: "roleName",
       },
       {
@@ -146,22 +159,73 @@ inquirer
 })
 }
 
-updateEmployee = () => {
-inquirer
-.prompt([
 
-  // somehow the choices in inquirer have to pull from the table of employees
-  // then we have to take the ID that is chosen and give the user the option of UPDATING the role
-  {
-    message: 'What employee would you like to update?',
-    type: 'list',
-    name: 'employeeNames',
-    choices: [
-      'all the choices',
-      'more choices']
-  }
-])
-.then((data) => {
-  homeChoice()
+updateEmployee = () => {
+
+  db.query(
+    "SELECT CONCAT(first_name, ' ', last_name) AS fullName FROM employees",
+    (err, results) => {
+      const names = [];
+      results.forEach((result) => {
+        names.push(result.fullName);
+      });
+
+      inquirer
+        .prompt([
+          {
+            message: "What employee would you like to update?",
+            type: "list",
+            name: "employeeNames",
+            choices: names,
+          },
+        ])
+        .then((employeeChoice) => {
+employeeRole(employeeChoice)
+        });
+    }
+  );
+};
+
+
+employeeRole = (employeeChoice) => {
+  console.log(employeeChoice)
+  const empUpdate = []
+  empUpdate.push(employeeChoice)
+  db.query("SELECT title FROM roles", (err, results) => {
+    const titles = [];
+    results.forEach((result) => {
+      titles.push(result.title);
+    });
+
+    inquirer
+      .prompt([
+        {
+          message: "What is the new role of this employee?",
+          type: "list",
+          name: "newRole",
+          choices: titles,
+        },
+      ])
+      .then((choice) => {
+empUpdate.push(choice)
+console.log(empUpdate)
+console.log(empUpdate[0].employeeNames)
+        employeeId(empUpdate)
+      });
+  });
+};
+
+
+employeeId = (empUpdate) => {
+  const empData = [];
+  empData.push(empUpdate);
+
+  const sql = `SELECT role_id FROM employees WHERE CONCAT(first_name, ' ', last_name) = ?`
+  const params = empUpdate[0].employeeNames
+db.query(sql, params, (err, results) => {
+  console.log(results)
+  empData.push(results)
+  empUpdateFinal(empData)
 })
 }
+
