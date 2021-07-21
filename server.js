@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
 const db = require('./db/connection.js');
-const table = require('console.table')
+const table = require('console.table');
 
 homeChoice = () => {
   inquirer
@@ -83,10 +83,22 @@ viewRoles = () => {
 
 viewEmployees = () => {
     //READ db employees table
-   
+   db.query(
+     `SELECT * FROM employees 
+     LEFT JOIN roles 
+     ON employees.role_id = roles.id 
+     LEFT JOIN departments 
+     ON roles.department_id = departments.id;`, 
+   (err, results) => {
+     console.table(results);
+     homeChoice() 
+   })
 
+// WHEN I choose to view all employees
+// THEN I am presented with a formatted table showing employee data, including employee ids,
+// first names, last names, job titles, departments, salaries, and managers that the employees report to
+// WHEN I choose to add a department
 
-    homeChoice() 
 }
 
 addDepartment = () => {
@@ -230,7 +242,8 @@ empUpdateFinal = (empData) => {
   const params = [empData[2][0].id, empData[0].employeeNames];
 
   db.query(sql, params, (err, results) => {
-    console.log(results);
+    console.log(`${empData[0].employeeNames}s role has been changed to ${empData[1].newRole}`);
+    homeChoice()
   });
 };
 
