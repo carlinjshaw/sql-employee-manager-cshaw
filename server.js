@@ -59,26 +59,32 @@ welcome = () => {
 welcome()
 
 viewDepartments = () => {
-    //READ db departments table
-    // db.query('SELECT * FROM `departments`', (data) => {
-    //   console.table(data);
-    // })
-    db.query(
+  //READ db departments table
+  db.query(
       'SELECT * FROM `departments`',
       function(err, results) {
-        console.table(results); // results contains rows returned by server
-        // console.log(fields); // fields contains extra meta data about results, if available
+        console.table(results); 
         homeChoice() 
       }
       );
-      
-
 }
 
 viewRoles = () => {
     //READ db roles table
-    homeChoice() 
+    db.query(
+      `SELECT * FROM roles 
+      LEFT JOIN departments 
+      ON roles.department_id = departments.id;`, 
+    (err, results) => {
+      console.table(results);
+      homeChoice() 
+    }) 
 }
+
+// WHEN I choose to view all roles
+// THEN I am presented with the job title, role id, the department
+//  that role belongs to, and the salary for that role
+
 
 
 viewEmployees = () => {

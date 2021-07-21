@@ -27,7 +27,7 @@ INSERT INTO employees
 ('Jon', 'Crist', 2, 1),
 ('Krista', 'Jones', 3, 1),
 ('Malik', 'Reed', 4, 1),
-('Willow', 'Creek', 5, 2),
+('Willow', 'Haart', 5, 2),
 ('Yareil', 'Mendoza', 6, 2),
 ('Wilbur', 'Stark', 7, 2)
 ;
