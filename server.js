@@ -84,6 +84,8 @@ viewRoles = () => {
 viewEmployees = () => {
     //READ db employees table
    
+
+
     homeChoice() 
 }
 
@@ -161,7 +163,6 @@ inquirer
 
 
 updateEmployee = () => {
-
   db.query(
     "SELECT CONCAT(first_name, ' ', last_name) AS fullName FROM employees",
     (err, results) => {
@@ -180,17 +181,16 @@ updateEmployee = () => {
           },
         ])
         .then((employeeChoice) => {
-employeeRole(employeeChoice)
+          employeeRole(employeeChoice);
         });
     }
   );
 };
 
-
 employeeRole = (employeeChoice) => {
-  console.log(employeeChoice)
-  const empUpdate = []
-  empUpdate.push(employeeChoice)
+  console.log(employeeChoice);
+  const empUpdate = [];
+  empUpdate.push(employeeChoice);
   db.query("SELECT title FROM roles", (err, results) => {
     const titles = [];
     results.forEach((result) => {
@@ -207,25 +207,31 @@ employeeRole = (employeeChoice) => {
         },
       ])
       .then((choice) => {
-empUpdate.push(choice)
-console.log(empUpdate)
-console.log(empUpdate[0].employeeNames)
-        employeeId(empUpdate)
+        empUpdate.push(choice);
+        console.log(empUpdate);
+        console.log(empUpdate[0].employeeNames);
+        employeeId(empUpdate);
       });
   });
 };
 
+employeeId = (empData) => {
+  const sql = `SELECT id FROM roles WHERE title = ?`;
+  const params = empData[1].newRole;
+  db.query(sql, params, (err, results) => {
+    empData.push(results);
+    console.log(empData);
+    empUpdateFinal(empData);
+  });
+};
 
-employeeId = (empUpdate) => {
-  const empData = [];
-  empData.push(empUpdate);
+empUpdateFinal = (empData) => {
+  const sql = `UPDATE employees SET role_id = ? WHERE CONCAT(first_name, ' ', last_name) = ?`;
+  const params = [empData[2][0].id, empData[0].employeeNames];
 
-  const sql = `SELECT role_id FROM employees WHERE CONCAT(first_name, ' ', last_name) = ?`
-  const params = empUpdate[0].employeeNames
-db.query(sql, params, (err, results) => {
-  console.log(results)
-  empData.push(results)
-  empUpdateFinal(empData)
-})
-}
+  db.query(sql, params, (err, results) => {
+    console.log(results);
+  });
+};
 
+//update employee SET role_id = (id of the name of role) WHERE CONCAT fullname = (the one we have)
