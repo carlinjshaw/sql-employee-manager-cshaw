@@ -102,44 +102,89 @@ addDepartment = () => {
       {
         type: "input",
         message: "What is the name of the department you would like to add",
-        name: "addedDepartment"
-      }
+        name: "addedDepartment",
+      },
     ])
     .then((data) => {
       //CREATE new department in the department table
-      const  sql = `INSERT INTO departments (name) VALUES (?);`;
-      const params = data.addedDepartment
+      const sql = `INSERT INTO departments (name) VALUES (?);`;
+      const params = data.addedDepartment;
       db.query(sql, params, (err, results) => {
         homeChoice();
-      }) 
+      });
     });
 };
 
+// const empUpdate = [];
+//   empUpdate.push(employeeChoice);
+//   db.query("SELECT title FROM roles", (err, results) => {
+//     const titles = [];
+//     results.forEach((result) => {
+//       titles.push(result.title);
+//     });
+
 addRole = () => {
+
+db.query(`SELECT name FROM departments`, (err, results) =>{
+  const roleNames = [];
+  results.forEach((result)=> {
+    roleNames.push(result.name);
+  })
+
   inquirer
-    .prompt([
-      {
-        type: "input",
-        message: "What is the title of the role you would like to add?",
-        name: "roleName",
-      },
-      {
-        type: "input",
-        message: "What is the salary of the role you would like to add",
-        name: "roleSalary",
-      },
-      {
-        type: "input",
-        message: "What is the department of this role?",
-        name: "roleDepartment",
-      }
-    ])
-    .then((data) => {
-      //CREATE the new role in the role db table
-console.log(data)
-      homeChoice();
-    });
+  .prompt([
+    {
+      type: "input",
+      message: "What is the title of the role you would like to add?",
+      name: "roleName",
+    },
+    {
+      type: "input",
+      message: "What is the salary of the role you would like to add",
+      name: "roleSalary",
+    },
+    {
+      type: "list",
+      message: "What is the department of this role?",
+      name: "roleDepartment",
+      choices: roleNames,
+    }
+  ])
+  .then((data) => {
+    addRoleId(data)
+  })
+    
+});
 };
+
+addRoleId = (data) => {
+  
+  const roleData = [];
+  roleData.push(data);
+
+  const sql = `SELECT id FROM departments WHERE name = ?`
+  const params = data.roleDepartment
+
+  db.query(sql, params, (err, results) => {
+    console.log(results)
+    roleData.push(results)
+    console.log(roleData)
+    addRoleFinal(roleData)
+  })
+}
+
+addRoleFinal = (roleData) => {
+
+  const sql = `INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`
+  const params = [roleData[0].roleName, roleData[0].roleSalary, roleData[1][0].id]
+
+  db.query(sql, params, (err, results) => {
+
+console.log(results)
+    homeChoice();
+  })
+
+}
 
 addEmployee = () => {
 inquirer
@@ -154,21 +199,89 @@ inquirer
         message: 'What is the employees last name?',
         name: 'employeeLast'
     },
-    {
-        type: 'input',
-        message: 'What is the employees role?',
-        name: 'employeeRole'
-    },
-    {
-        type: 'input',
-        message: 'Who is the employees manager?',
-        name: 'employeeManager'
-    }
 ])
 .then((data) => {
     //CREATE new employee inside employee table
-    homeChoice()
+    addEmpRole(data)
 })
+}
+
+addEmpRole = (data) =>{
+
+  const newEmpData = [];
+  newEmpData.push(data);
+  db.query("SELECT title FROM roles", (err, results) => {
+    const titles = [];
+    results.forEach((result) => {
+      titles.push(result.title);
+    });
+
+    inquirer
+      .prompt([
+        {
+          message: "What is the role of this employee?",
+          type: "list",
+          name: "newRole",
+          choices: titles,
+        },
+        {
+message: "Who will be the manager of this employee?",
+type: "list",
+name: "empManager",
+choices: [
+  'John Williams',
+  'Edward Snowden',
+  'Krista Jones'
+]
+        },
+      ])
+      .then((choice) => {
+        newEmpData.push(choice);
+        console.log(newEmpData);
+        findIdEmp(newEmpData)
+      });
+  });
+}
+
+
+findIdEmp = (data) => {
+  
+  
+
+  const sql = `SELECT id FROM roles WHERE title = ?`
+  const params = data[1].newRole
+  db.query(sql, params, (err, results) => {
+    
+    data.push(results)
+    console.log(data)
+    addEmpManager(data)
+  })
+}
+
+addEmpManager = (data) => {
+  
+  const sql = `SELECT id FROM employees WHERE CONCAT(first_name, ' ', last_name) = ?`
+  const params = data[1].empManager
+  db.query(sql, params, (err, results) => {
+    
+    data.push(results)
+    console.log(data)
+    addEmpFinal(data)
+  })
+
+}
+
+addEmpFinal = (data) => {
+
+  const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`
+  const params = [data[0].employeeFirst, data[0].employeeLast, data[2][0].id, data[3][0].id]
+
+  db.query(sql, params, (err, results) => {
+
+console.log(results)
+    homeChoice();
+  })
+
 }
 
 
